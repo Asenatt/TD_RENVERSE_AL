@@ -71,6 +71,10 @@ public class Puissance4Impl implements Puissance4 {
 		return str.toString();
 	}
 
+	
+/*
+ *Build the Puissance 4 depending of the builder 
+ * */
 	public void buildPuissance4(P4Builder bld){
 		bld.createNewPuissance4();
 		
@@ -100,7 +104,7 @@ public class Puissance4Impl implements Puissance4 {
 	}
 	
 	/*
-	 * Ends the game
+	 * Checks if the game is over or not
 	 * */
 	public boolean isFinished() {
 		return _finished;
