@@ -13,10 +13,10 @@ public class Puissance4Impl implements Puissance4 {
 		return _player;
 	}
 
-	public P4Player player1() {
+	public P4Player getPlayer1() {
 		return _p1;
 	}
-	public P4Player player2() {
+	public P4Player getPlayer2() {
 		return _p2;
 	}
 	
@@ -70,11 +70,39 @@ public class Puissance4Impl implements Puissance4 {
 		str.append("***************\n");
 		return str.toString();
 	}
+
+	public void buildPuissance4(P4Builder bld){
+		bld.createNewPuissance4();
+		
+		bld.beginHeader();
+		bld.addString("***************");
+		bld.endHeader();
+		
+		bld.beginTable();
+		for (int i = HEIGHT-1; i >= 0; --i){
+			bld.beginRow();
+			for (int j = 0; j < WIDTH; ++j){
+				bld.beginColumn();
+				if (_tab[i][j] == _p1)
+					bld.addString("X");
+				if (_tab[i][j] == null)
+					bld.addString(" ");
+				if (_tab[i][j] == _p2)
+					bld.addString("O");
+				bld.endColumn();
+			}
+			bld.endRow();	
+		}
+		bld.addString("***************\n");
+		bld.endTable();
+
+		bld.finish();
+	}
 	
 	/*
 	 * Ends the game
 	 * */
-	public boolean end() {
+	public boolean isFinished() {
 		return _finished;
 	}
 	
@@ -108,7 +136,7 @@ public class Puissance4Impl implements Puissance4 {
 	 * Places token of a player and switches the player to the next one
 	 * */
 	public void play(int col) {
-		if (end()) return;
+		if (isFinished()) return;
 		--_freePlaces;
 		int i=0;
 		while(i < HEIGHT && _tab[i][col] != null)

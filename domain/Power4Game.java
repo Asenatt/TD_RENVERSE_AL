@@ -1,5 +1,6 @@
 package domain;
 import Factory.*;
+import ui.*;
 
 public class Power4Game {
 	/*
@@ -7,12 +8,17 @@ public class Power4Game {
 	 * 
 	 * */
 	public static void run(Puissance4 board) {
-		while(!board.end()) {
-			System.out.println(board);
+		TextBuilder bld = new TextBuilder();
+		while(!board.isFinished()) {
+			//System.out.println(board);
+			board.buildPuissance4(bld);
+			System.out.println(bld.getPuissance4());
 			System.out.println("Player " + board.currentPlayer() +  " turn");
 			board.play(board.currentPlayer().play());
 		}		
-		System.out.println(board);
+		//System.out.println(board);
+		board.buildPuissance4(bld);
+		System.out.println(bld.getPuissance4());
 	}
 	public static void main(String argv[]) {
 		Puissance4 board = Puissance4Impl.getInstance();

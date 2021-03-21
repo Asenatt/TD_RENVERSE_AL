@@ -6,10 +6,10 @@ public class OpponentBot extends DecoratorBot {
 	}
 	public int play() {
 		P4Player _opponent;
-		if (_board.player1() != this)
-			_opponent = _board.player1();
+		if (_board.getPlayer1() != this)
+			_opponent = _board.getPlayer1();
 		else
-			_opponent = _board.player2();
+			_opponent = _board.getPlayer2();
 		for (int i=0; i < Puissance4.WIDTH; ++i) { 
 			if (_board.checkWin(i, _opponent))
 				return i;
