@@ -1,6 +1,6 @@
-package Factory;
+package factory;
 
-import domain.HumanBot;
+import domain.HumanPlayer;
 import domain.P4Player;
 import domain.Puissance4;
 
@@ -12,7 +12,7 @@ public class HumanBotFactory implements BotFactory {
 
 	@Override
 	public P4Player createBot(Puissance4 board) {
-		return new HumanBot(board);
+		return new HumanPlayer(board);
 	}
 
 }

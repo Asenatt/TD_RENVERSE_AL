@@ -1,4 +1,4 @@
-package Factory;
+package factory;
 
 import domain.*;
 public class DirectWinBotFactory implements BotFactory {

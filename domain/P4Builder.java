@@ -8,19 +8,19 @@ public interface P4Builder {
   public void endHeader();
 
   public void beginTable();
-	public void endTable();
+  public void endTable();
 	
-	public void beginRow();
-	public void endRow();
+  public void beginRow();
+  public void endRow();
 	
-	public void beginColumn();
-	public void endColumn();
+  public void beginColumn();
+  public void endColumn();
 	
-	public void beginParagraph();
-	public void endParagraph();
+  public void beginParagraph();
+  public void endParagraph();
 
-	public void addString(String s);
+  public void addString(String s);
 	
-	public void finish();
+  public void finish();
 
 }

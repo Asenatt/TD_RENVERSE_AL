@@ -2,7 +2,11 @@ package domain;
 
 
 public class Puissance4Impl implements Puissance4 {
-
+	/*
+	 * Volatile is to avoid the case in which a thread thinks 
+	 * mistakingly that another thread has instantiated the object
+	 * but in fact the instantiation is not finished
+	 * */
 	private static volatile Puissance4Impl instance;
 	
 	private P4Player [][] _tab;
@@ -23,6 +27,7 @@ public class Puissance4Impl implements Puissance4 {
 	private Puissance4Impl() {
 		
 	}
+	
 	/* Double checked locking:
 	 * https://en.wikipedia.org/wiki/Double-checked_locking#Usage_in_Java 
 	 * */
@@ -43,38 +48,17 @@ public class Puissance4Impl implements Puissance4 {
 		_p1 = p1;
 		_p2 = p2;
 		_player = _p1;
-		_tab = new P4Player[WIDTH][HEIGHT];
-		for (int i=0; i < WIDTH; ++i)
-			for (int j=0; j < HEIGHT; ++j)
-				_tab[i][j] = null;
+		_tab = new P4Player[HEIGHT][WIDTH];
+		for (int line = 0; line < HEIGHT; ++line)
+			for (int col = 0; col < WIDTH; ++col)
+				_tab[line][col] = null;
 		_finished = false;
 		_freePlaces = WIDTH * HEIGHT;
 	}
 	
-	public String toString() {
-		StringBuffer str = new StringBuffer();
-		str.append("***************\n");
-		for (int i=WIDTH-1; i >=0; --i) {
-			str.append("|");
-			for (int j=0; j < HEIGHT; ++j) {
-				if (_tab[i][j] == _p1)
-					str.append("X");
-				if (_tab[i][j] == null)
-					str.append(" ");
-				if (_tab[i][j] == _p2)
-					str.append("O");
-				str.append("|");
-			}
-			str.append("\n");
-		}
-		str.append("***************\n");
-		return str.toString();
-	}
-
-	
-/*
- *Build the Puissance 4 depending of the builder 
- * */
+	/*
+	 *Build the Puissance 4 depending of the builder 
+	 * */
 	public void buildPuissance4(P4Builder bld){
 		bld.createNewPuissance4();
 		
@@ -83,15 +67,15 @@ public class Puissance4Impl implements Puissance4 {
 		bld.endHeader();
 		
 		bld.beginTable();
-		for (int i = HEIGHT-1; i >= 0; --i){
+		for (int line = HEIGHT-1; line >= 0; --line){
 			bld.beginRow();
-			for (int j = 0; j < WIDTH; ++j){
+			for (int col = 0; col < WIDTH; ++col){
 				bld.beginColumn();
-				if (_tab[i][j] == _p1)
+				if (_tab[line][col] == _p1)
 					bld.addString("X");
-				if (_tab[i][j] == null)
+				if (_tab[line][col] == null)
 					bld.addString(" ");
-				if (_tab[i][j] == _p2)
+				if (_tab[line][col] == _p2)
 					bld.addString("O");
 				bld.endColumn();
 			}
@@ -116,10 +100,8 @@ public class Puissance4Impl implements Puissance4 {
 	public boolean isFree(int col) {
 		if(_freePlaces <= 0) return false;
 		if (col <0 || col >= WIDTH) return false;
-		int i=0;
-		while(i < HEIGHT && _tab[i][col] != null)
-			++i;
-		if (i >= HEIGHT)
+		int line = getHighestAvailableLine(col);
+		if (line >= HEIGHT)
 			return false;
 		return true;
 
@@ -142,14 +124,9 @@ public class Puissance4Impl implements Puissance4 {
 	public void play(int col) {
 		if (isFinished()) return;
 		--_freePlaces;
-		int i=0;
-		while(i < HEIGHT && _tab[i][col] != null)
-			++i;
-		if (i >= HEIGHT) {
-			//error
-		}
-		_tab[i][col] = _player;
-		if (testwin(i, col)) {
+		int line = getHighestAvailableLine(col);
+		_tab[line][col] = _player;
+		if (testwin(line, col)) {
 			System.out.println("player " + _player + " win");
 			_finished = true;
 			return;
@@ -160,21 +137,21 @@ public class Puissance4Impl implements Puissance4 {
 	/*
 	 * Tests if a player won by checking if 4 tokens are aligned diagonally, in a line or in column 
 	 * */
-	public boolean testwin(int i, int col) {
+	public boolean testwin(int line, int col) {
 		int length = 1 , height = 1, diagonal1 = 1, diagonal2 = 1;
-		P4Player p = _tab[i][col];
+		P4Player p = _tab[line][col];
 
-		for (int x = i + 1; x < WIDTH && _tab[x][col] == p; ++x) ++length;
-		for (int x = i - 1; x >=  0   && _tab[x][col] == p; --x) ++length;
+		for (int x = line + 1; x < HEIGHT && _tab[x][col] == p; ++x) ++height;
+		for (int x = line - 1; x >=  0   && _tab[x][col] == p; --x) ++height;
 
-		for (int x = col + 1; x < WIDTH && _tab[i][x] == p; ++x) ++height;
-		for (int x = col - 1; x >=  0   && _tab[i][x] == p; --x) ++height;
+		for (int x = col + 1; x < WIDTH && _tab[line][x] == p; ++x) ++length;
+		for (int x = col - 1; x >=  0   && _tab[line][x] == p; --x) ++length;
 
-		for (int x = i + 1, y = col + 1; x < WIDTH && y < HEIGHT && _tab[x][y] == p; ++x, ++y) ++diagonal1;
-		for (int x = i - 1, y = col - 1; x >= 0 && y >= 0 && _tab[x][y] == p; --x, --y) ++diagonal1;
+		for (int x = line + 1, y = col + 1; x < HEIGHT && y < WIDTH && _tab[x][y] == p; ++x, ++y) ++diagonal1;
+		for (int x = line - 1, y = col - 1; x >= 0 && y >= 0 && _tab[x][y] == p; --x, --y) ++diagonal1;
 
-		for (int x = i + 1, y = col - 1; x < WIDTH && y >= 0     && _tab[x][y] == p; ++x, --y) ++diagonal2;
-		for (int x = i - 1, y = col + 1; x >= 0    && y < HEIGHT && _tab[x][y] == p; --x, ++y) ++diagonal2;
+		for (int x = line + 1, y = col - 1; x < HEIGHT && y >= 0     && _tab[x][y] == p; ++x, --y) ++diagonal2;
+		for (int x = line - 1, y = col + 1; x >= 0    && y < WIDTH && _tab[x][y] == p; --x, ++y) ++diagonal2;
 		//System.out.println("res " +l + " " + h + " " + d1 +  " " +d2);
 		if (length >3)  return true;
 		if (height >3)  return true;
@@ -188,13 +165,18 @@ public class Puissance4Impl implements Puissance4 {
 	 * */
 	public boolean checkWin(int col, P4Player player) {
 		if (!isFree(col)) return false;
-		int i=0;
-		while(i < HEIGHT && _tab[i][col] != null)
-			++i;
-		_tab[i][col] = player;
-		boolean result = testwin(i, col);
-		_tab[i][col] = null;
+		int line = getHighestAvailableLine(col);
+		_tab[line][col] = player;
+		boolean result = testwin(line, col);
+		_tab[line][col] = null;
 		return result;
+	}
+	
+	private int getHighestAvailableLine(int col) {
+		int line = 0;
+		while(line < HEIGHT && _tab[line][col] != null)
+			++line;
+		return line;
 	}
 
 }

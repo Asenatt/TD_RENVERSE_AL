@@ -1,6 +1,4 @@
-package Factory;
-import domain.DirectWinBot;
-import domain.OpponentBot;
+package factory;
 import domain.P4Player;
 import domain.Puissance4;
 import domain.RandomBot;
